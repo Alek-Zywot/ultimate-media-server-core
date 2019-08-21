@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  lazylibrarian:
+    image: linuxserver/lazylibrarian
+    container_name: lazylibrarian
+    hostname: lazylibrarian
+    restart: unless-stopped
+
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ="America/New_York"
+      - DOCKER_MODS=linuxserver/calibre-web:calibre  # allows LL to add/update calibre
+
+    volumes:
+      - ${appdata}/lazylibrarian:/config
+      - /etc/localtime:/etc/localtime:ro
+
+      - ${books}:/books
+      - ${shares}/Audiobooks:/audiobooks
+      - ${downloads}:/downloads
+
+    ports:
+      - 9025:5299
+
+    healthcheck:
+      test: curl --fail -s http://localhost:5299/ || exit 1
+      interval: 60s
+      timeout: 10s
+      retries: 3
