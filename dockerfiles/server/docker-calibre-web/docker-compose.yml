@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  calibre-web:    # Defaults == Username: admin   Password: admin123
+    # library location = /books
+    # Basic Config: External Binaries -> path to converter: /usr/bin/ebook-convert
+    image: linuxserver/calibre-web
+    container_name: calibre-web
+    hostname: calibre-web
+    restart: unless-stopped
+
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ="America/New_York"
+      - DOCKER_MODS=linuxserver/calibre-mod:latest  #installs calibre ebook format converter
+
+    volumes:
+      - ${appdata}/calibre-web:/config
+      - /etc/localtime:/etc/localtime:ro
+
+      - ${books}:/books
+
+    ports:
+      - 9005:8083
+
+    healthcheck:
+      test: curl --fail -s http://localhost:8083/ || exit 1
+      interval: 60s
+      timeout: 10s
+      retries: 3
