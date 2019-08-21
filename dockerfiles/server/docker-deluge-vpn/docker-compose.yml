@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  deluge-vpn: #default user/password = admin/deluge
+  # openvpn certs = deluge/config/openvpn
+    image: binhex/arch-delugevpn:1.3.15_18_ge050905b2-1-04  # newer builds dont work on my synology nas
+    container_name: deluge
+    hostname: deluge
+    privileged: true. # required for openvpn to work on synology nas
+    restart: unless-stopped
+
+    ports:
+      - 9029:8112
+      - 8118:8118
+      - 58846:58846
+      - 58946:58946
+    cap_add:
+      - NET_ADMIN
+
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VPN_ENABLED=yes
+      - ENABLE_PRIVOXY=yes
+      - STRICT_PORT_FORWARD=yes
+      - LAN_NETWORK=${network_ip}
+      - NAME_SERVERS=10.78.13.1,108.59.1.193,1.1.1.1,209.222.18.222,84.200.69.80,37.235.1.174,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
+      - DEBUG=false
+      - OPENVPN_OPTS="–inactive 3600 –ping 10 –ping-exit 60"
+      - UMASK=022
+      - VPN_PROV=custom
+      - VPN_USER=<vpn user name>
+      - VPN_PASS=<vpn password>
+
+    volumes:
+      - ${appdata}/deluge:/config
+      - ${downloads}:/downloads
+      - /etc/localtime:/etc/localtime:ro
