@@ -1,0 +1,13 @@
+version: '3'
+services:
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+
+    command: --schedule " 0 0 1 * * 2,4" --cleanup --stop-timeout 30s
+      # updates every Tue & Thurs at 1am
